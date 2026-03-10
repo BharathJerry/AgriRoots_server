@@ -34,7 +34,7 @@ app.add_middleware(
 )
 
 # Configuration
-FCM_SERVER_URL = os.getenv("FCM_SERVER_URL", "http://10.114.135.36:5000")  # Your Flask FCM server
+FCM_SERVER_URL = os.getenv("FCM_SERVER_URL", "https://agriroots-server-fcm.onrender.com")  # Your Flask FCM server
 UPLOAD_DIR = "static/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
