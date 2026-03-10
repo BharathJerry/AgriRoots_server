@@ -26,35 +26,41 @@ app = Flask(__name__)
 CORS(app)
 
 # Firebase initialization
-cred_path = os.getenv("FIREBASE_CREDENTIALS")
+credential_json = os.getenv("FIREBASE_CREDENTIALS")
 project_id = os.getenv("FIREBASE_PROJECT_ID")
 sender_id = os.getenv("FIREBASE_SENDER_ID", "70868825299")
 
-if not cred_path:
-    raise ValueError("Firebase credentials path not found in .env file")
+if not credential_json:
+    raise ValueError("FIREBASE_CREDENTIALS environment variable not found")
 
-if not os.path.exists(cred_path):
-    raise FileNotFoundError(f"Credentials file not found at: {cred_path}")
+if not project_id:
+    raise ValueError("FIREBASE_PROJECT_ID environment variable not found")
 
 try:
+    # Parse credentials from environment variable
+    cred_dict = json.loads(credential_json)
+    
     # Initialize Firebase
     if not firebase_admin._apps:
-        cred = credentials.Certificate(cred_path)
+        cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred, {
             'projectId': project_id
         })
-        logger.info("✅ Firebase initialized successfully")
+        logger.info("✅ Firebase initialized successfully from environment variable")
         logger.info(f"📱 Sender ID: {sender_id}")
-        logger.info(f"📁 Using credentials from: {cred_path}")
+        logger.info(f"📁 Using credentials from: environment variable")
     
     # Initialize Firestore
     db = firestore.client()
     logger.info("✅ Firestore initialized successfully")
     
+except json.JSONDecodeError as e:
+    logger.error(f"❌ Failed to parse Firebase credentials JSON: {e}")
+    logger.error("Make sure FIREBASE_CREDENTIALS is a valid JSON string")
+    raise
 except Exception as e:
     logger.error(f"❌ Failed to initialize Firebase: {e}")
     raise
-
 
 class FCMNotificationService:
     """Service for handling FCM notifications (v1 API)"""
