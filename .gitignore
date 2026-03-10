@@ -39,3 +39,6 @@ Thumbs.db
 *.jpeg
 *.png
 static/uploads/
+
+FCM/FCM_Render.py
+static/uploads/
